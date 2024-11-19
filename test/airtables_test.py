@@ -64,14 +64,14 @@ class Airtable:
                 break
             offset = OutputTable["offset"]
         if AllRecordIds:
-            with open('InvestorData.json','w+') as Data:
+            with open('../documents/InvestorData.json','w+') as Data:
                 Data.write(json.dumps(AllRecordIds))
 
     def FindInvestor(self,invName):
-        with open('./InvestorData.json','r+') as inv:
+        with open('../documents/InvestorData.json','r+') as inv:
             investors = json.load(inv)
         investor = next((i for i in investors if i['InvName'] == invName), None)
-        return investor['RecordId'] if investor else None, print(f'Investor "{invName}" not found!')
+        return investor['RecordId'] if investor else print(f'Investor "{invName}" not found!')
 
     def FuzMatch(self,CompanyRecords):
         print("Checking Company...")
@@ -116,10 +116,7 @@ class Airtable:
         companyName = data['fields']['Company Name']
         response = requests.request(
             "PATCH",
-            f"https://api.airtable.com/v0/{cred[1]}/{cred[2]}/"
-            f"{requests.request('GET', f'https://api.airtable.com/v0/{cred[1]}/{cred[2]}?filterByFormula=%7BCompany+Name%7D%3D%27{urllib.parse.quote_plus(companyName)}%27', headers=self.headers).json()['records'][0]['id']}",
-            headers=self.headers,
-            data=json.dumps(data)
+            f"https://api.airtable.com/v0/{cred[1]}/{cred[2]}/{recId}",headers=self.headers,data=json.dumps(data)
         )
         print("CRM PATHCING STATUS: ", response.status_code)
         if response.status_code != 200:
@@ -146,3 +143,5 @@ if __name__ == "__main__":
     ar.FuzMatch(CompanyRecords=ar.GetCompany(cred=credential))
     # ar.GetInvestors()
     # ar.DeleteFields(recId="rec02wx281njjRjhm",tabId="tblf4Ed9PaDo76QHH")
+    # print(ar.FindInvestor(invName="TESTI INVESTOR"))
+    # ar.UpRec(cred=ar.Credd(view="",crmid="appjvhsxUUz6o0dzo",prostable="tblf4Ed9PaDo76QHH"),data={"fields":{"Company Name":"KEY Concierge"}},recId="CompRec")
