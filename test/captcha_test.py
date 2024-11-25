@@ -1,15 +1,13 @@
-import os
 from selenium.webdriver.common.by import By
-from seleniumbase import SB
+from seleniumbase import Driver
 from dotenv import load_dotenv
 from lxml import html
-import openpyxl
+import openpyxl,os
 
 load_dotenv()
-
 class Cnbase:
 	def __init__(self):
-		self.sb = None
+		self.sb = Driver(uc=True,headless=False)
 		self.email = os.getenv('EMAIL')
 		self.password = os.getenv('PASS')
 
@@ -137,12 +135,8 @@ class Cnbase:
 		]
 		self.storeData('./data.xlsx',new_data)
 
-	def main(self):
-		with SB(uc=True,headless=True) as sb:
-			self.sb = sb
-			if self.login():
-				print("login successfully")
-				self.getInvestments("https://www.crunchbase.com/organization/nashville-entrepreneur-center")
-
-crunchbase = Cnbase()
-crunchbase.main()
+if __name__ == "__main__":
+	crunchbase = Cnbase()
+	if crunchbase.login():
+		print("login successfully!")
+		# crunchbase.getInvestments("https://www.crunchbase.com/organization/nashville-entrepreneur-center")

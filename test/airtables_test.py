@@ -75,7 +75,7 @@ class Airtable:
 
     def FuzMatch(self,CompanyRecords):
         print("Checking Company...")
-        df = pd.read_excel('..\documents\data-shortly.xlsx')
+        df = pd.read_excel('..\documents\data-shortly.xlsx').drop_duplicates()
         for row_index in range(df.shape[0]):
             for record in CompanyRecords:
                 percetange = fuzz.ratio(df.iloc[row_index,1],record['Company'])
@@ -98,10 +98,13 @@ class Airtable:
                     }
                 })
                 try:
-                    CompRec = self.CreateField(cred=ar.Credd(view="Company",crmid="appjvhsxUUz6o0dzo",prostable="tblEssTJ1FlLrTj8Q"),data=CompData)
-                    ProsRec = self.CreateField(cred=ar.Credd(view=df.iloc[row_index,0],crmid="appjvhsxUUz6o0dzo",prostable="tblf4Ed9PaDo76QHH"),data=ProsData)
-                    self.UpRec(cred=ar.Credd(view=df.iloc[row_index,0],crmid="appjvhsxUUz6o0dzo",prostable="tblf4Ed9PaDo76QHH"),data={"fields":{"Company Name":df.iloc[row_index,1],"Link to Company":[CompRec],"Linked Investors":[self.FindInvestor(invName=df.iloc[row_index,0])],"Investors":[self.FindInvestor(invName=df.iloc[row_index,0])]}},recId=ProsRec)
-                    self.UpRec(cred=ar.Credd(view="Company",crmid="appjvhsxUUz6o0dzo",prostable="tblEssTJ1FlLrTj8Q"),data={"fields":{"Company Name":df.iloc[row_index,1],"Is Prospect (Link to Prospects)":[ProsRec],"Linked Investors (Link to Investors)":[self.FindInvestor(invName=df.iloc[row_index,0])]}},recId=CompRec)
+                    foundInvest = self.FindInvestor(invName=df.iloc[row_index,0])
+                    if foundInvest: 
+                        print(foundInvest)
+                        CompRec = self.CreateField(cred=ar.Credd(view="Company",crmid="appjvhsxUUz6o0dzo",prostable="tblEssTJ1FlLrTj8Q"),data=CompData)
+                        ProsRec = self.CreateField(cred=ar.Credd(view=df.iloc[row_index,0],crmid="appjvhsxUUz6o0dzo",prostable="tblf4Ed9PaDo76QHH"),data=ProsData)
+                        self.UpRec(cred=ar.Credd(view=df.iloc[row_index,0],crmid="appjvhsxUUz6o0dzo",prostable="tblf4Ed9PaDo76QHH"),data={"fields":{"Company Name":df.iloc[row_index,1],"Link to Company":[CompRec],"Linked Investors":[foundInvest],"Investors":[foundInvest]}},recId=ProsRec)
+                        self.UpRec(cred=ar.Credd(view="Company",crmid="appjvhsxUUz6o0dzo",prostable="tblEssTJ1FlLrTj8Q"),data={"fields":{"Company Name":df.iloc[row_index,1],"Is Prospect (Link to Prospects)":[ProsRec],"Linked Investors (Link to Investors)":[foundInvest]}},recId=CompRec)
                 except ValueError:
                     print("something error when creating data")
 
@@ -143,5 +146,4 @@ if __name__ == "__main__":
     ar.FuzMatch(CompanyRecords=ar.GetCompany(cred=credential))
     # ar.GetInvestors()
     # ar.DeleteFields(recId="rec02wx281njjRjhm",tabId="tblf4Ed9PaDo76QHH")
-    # print(ar.FindInvestor(invName="TESTI INVESTOR"))
     # ar.UpRec(cred=ar.Credd(view="",crmid="appjvhsxUUz6o0dzo",prostable="tblf4Ed9PaDo76QHH"),data={"fields":{"Company Name":"KEY Concierge"}},recId="CompRec")
