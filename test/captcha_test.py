@@ -139,4 +139,4 @@ if __name__ == "__main__":
 	crunchbase = Cnbase()
 	if crunchbase.login():
 		print("login successfully!")
-		# crunchbase.getInvestments("https://www.crunchbase.com/organization/nashville-entrepreneur-center")
+		crunchbase.getInvestments("https://www.crunchbase.com/organization/nashville-entrepreneur-center")
